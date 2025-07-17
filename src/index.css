@@ -1,0 +1,76 @@
+/* ============================
+    Import Google Fonts
+============================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=DM+Serif+Display&display=swap');
+
+/* ============================
+    Import Tailwind CSS Core
+============================ */
+@import "tailwindcss";
+
+/* ============================
+    DaisyUI Theme Configuration
+============================ */
+@plugin "daisyui" {
+    themes: light --default, dark;
+}
+
+/* 🌞 Light Theme */
+@plugin "daisyui/theme" {
+    name: "light";
+    default: true;
+
+    --color-primary: #2D9CDB;
+    /* Sky blue for main buttons, icons */
+    --color-secondary: #27AE60;
+    /* Fresh green for secondary highlights */
+    --color-accent: #56CCF2;
+    /* Light blue for accent details (hover, border) */
+    --color-neutral: #333333;
+    /* Dark text for contrast */
+    --color-base-100: #F9FAFB;
+    /* Main background (soft white/gray) */
+    --color-base-200: #E5E7EB;
+    /* Card, input background */
+    --color-base-300: #D1D5DB;
+    /* Border, subtle contrast elements */
+    --color-info: #1E88E5;
+    /* Used in tooltips, alerts, etc. */
+    --color-content: #111827;
+    /* Body text color for readability */
+}
+
+/* 🌙 Dark Theme */
+@plugin "daisyui/theme" {
+    name: "dark";
+
+    --color-primary: #58C6F1;
+    /* Bright sky blue for primary buttons */
+    --color-secondary: #6FCF97;
+    /* Soft green for success/secondary elements */
+    --color-accent: #81D4FA;
+    /* Blue accent for hover borders or icons */
+    --color-neutral: #F3F4F6;
+    /* Text color for high readability */
+    --color-base-100: #121212;
+    /* Main background */
+    --color-base-200: #1E1E1E;
+    /* Cards and containers */
+    --color-base-300: #2A2A2A;
+    /* Subtle contrast background or border */
+    --color-info: #90CAF9;
+    /* For tooltips or info sections */
+    --color-content: #E0E0E0;
+    /* Light gray for main text */
+}
+
+/* ============================
+    Global Styling
+============================ */
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Serif Display', serif;
+}
