@@ -7,10 +7,20 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinkClass = ({ isActive }) =>
-    `text-lg font-semibold px-4 py-2 rounded transition-all duration-200 ${isActive
-      ? 'text-primary border-b-2 border-primary dark:text-primary'
-      : 'text-base-content hover:text-primary hover:bg-base-200 dark:hover:text-primary'
+    `text-lg font-semibold px-4 py-2 rounded transition-all duration-200 ${
+      isActive
+        ? 'text-primary border-b-2 border-primary dark:text-primary'
+        : 'text-base-content hover:text-primary hover:bg-base-200 dark:hover:text-primary'
     }`;
+
+  const links = [
+    { to: '/', label: 'Home' },
+    { to: '/forecast', label: 'Forecast' },
+    { to: '/weekly', label: 'Weekly' },
+    { to: '/air-quality', label: 'Air Quality' },
+    { to: '/map', label: 'Map View' },
+    { to: '/uv-sun', label: 'UV & Sun Info' },
+  ];
 
   return (
     <header className="bg-base-100 shadow-md sticky top-0 z-50 transition-colors">
@@ -25,16 +35,15 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-6 items-center">
-          <NavLink to="/" className={navLinkClass}>
-            Home
-          </NavLink>
-          <NavLink to="/forecast" className={navLinkClass}>
-            Forecast
-          </NavLink>
+        <nav className="hidden md:flex gap-4 lg:gap-6 items-center">
+          {links.map(({ to, label }) => (
+            <NavLink key={to} to={to} className={navLinkClass}>
+              {label}
+            </NavLink>
+          ))}
         </nav>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Toggle */}
         <button
           className="md:hidden text-3xl text-primary focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -47,24 +56,21 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden bg-base-100 overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
-          }`}
+        className={`md:hidden bg-base-100 overflow-hidden transition-all duration-300 ease-in-out ${
+          menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
       >
         <nav className="px-6 pb-4 pt-2 flex flex-col gap-2">
-          <NavLink
-            to="/"
-            className={navLinkClass}
-            onClick={() => setMenuOpen(false)}
-          >
-            Home
-          </NavLink>
-          <NavLink
-            to="/forecast"
-            className={navLinkClass}
-            onClick={() => setMenuOpen(false)}
-          >
-            Forecast
-          </NavLink>
+          {links.map(({ to, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={navLinkClass}
+              onClick={() => setMenuOpen(false)}
+            >
+              {label}
+            </NavLink>
+          ))}
         </nav>
       </div>
     </header>
