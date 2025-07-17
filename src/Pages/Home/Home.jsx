@@ -1,28 +1,14 @@
-import {
-    WiThermometer,
-    WiHumidity,
-    WiStrongWind,
-    WiSunrise,
-    WiSunset,
-    WiDayFog,
-    WiBarometer,
-    WiDirectionUp,
-    WiCloudy,
-    WiTime3,
 
-    WiDaySunnyOvercast
-} from 'react-icons/wi';
 
 import { useState, useEffect } from 'react';
 import { fetchWeatherByCity } from '../../services/weatherService';
 import Lottie from 'lottie-react';
 import weatherAnimation from '../../assets/animation/clouds loop.json';
-import { motion } from 'framer-motion'; // <-- Import Framer Motion
+import { motion } from 'framer-motion';
+import WeatherSummary from './WeatherSummary';
+import WeatherDetails from './WeatherDetails';
 
-const formatTime = (unixTime) => {
-    const date = new Date(unixTime * 1000);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-};
+
 
 const Home = () => {
     const [city, setCity] = useState('');
@@ -102,7 +88,7 @@ const Home = () => {
                     value={city}
                     onChange={handleInputChange}
                     placeholder="Enter city name"
-                    className="input input-bordered w-full sm:max-w-sm text-lg px-4 py-3 dark:input-primary"
+                    className="input input-bordered w-full sm:max-w-sm text-lg px-4 py-3 dark:input-primary focus:outline-none focus:ring-2 focus:ring-primary"
                     aria-label="Enter city"
                     autoFocus
                 />
@@ -118,15 +104,21 @@ const Home = () => {
                         'Search'
                     )}
                 </button>
-
             </form>
 
             <div className="min-h-[1.5rem]" aria-live="polite">
-                {loading && <p className="text-base-content opacity-70">Fetching data...</p>}
+                {loading && (
+                    <div className="flex justify-center py-4">
+                        <span className="loading loading-dots loading-lg text-primary" />
+                    </div>
+                )}
                 {error && (
                     <p className="text-error font-medium" role="alert">
                         {error}
                     </p>
+                )}
+                {!loading && !weather && !error && (
+                    <p className="text-neutral text-center">No weather data available.</p>
                 )}
             </div>
 
@@ -146,41 +138,21 @@ const Home = () => {
                                 {weather.weather[0].description}
                             </p>
                         </div>
-                        <div className="text-6xl font-extrabold">
+                        <div className="text-6xl font-extrabold" aria-live="polite">
                             {Math.round(weather.main.temp)}°C
                         </div>
                     </div>
 
                     <div>
                         <img
-                            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`}
+                            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
                             alt={weather.weather[0].description}
-                            className="mx-auto w-32"
+                            className="mx-auto w-32 drop-shadow-md"
                         />
                     </div>
 
-                    {/* Summary Cards with Icons */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm sm:text-base">
-                        {[
-                            { label: 'Feels Like', value: `${Math.round(weather.main.feels_like)}°C`, icon: <WiThermometer /> },
-                            { label: 'Humidity', value: `${weather.main.humidity}%`, icon: <WiHumidity /> },
-                            { label: 'Wind Speed', value: `${weather.wind.speed} m/s`, icon: <WiStrongWind /> },
-                            { label: 'Sunrise', value: formatTime(weather.sys.sunrise), icon: <WiSunrise /> },
-                            { label: 'Sunset', value: formatTime(weather.sys.sunset), icon: <WiSunset /> },
-                            { label: 'Visibility', value: `${(weather.visibility / 1000).toFixed(1)} km`, icon: <WiDayFog /> },
-                        ].map((item, i) => (
-                            <div
-                                key={i}
-                                className="bg-white bg-opacity-10 p-4 rounded-xl backdrop-blur-md border border-white/20 flex flex-col items-center space-y-1"
-                            >
-                                <div className="text-3xl text-neutral">{item.icon}</div>
-                                <p className="font-semibold text-sm text-primary">{item.label}</p>
-                                <p className="text-sm text-neutral">{item.value}</p>
-                            </div>
-                        ))}
-                    </div>
+                    <WeatherSummary weather={weather} />
 
-                    {/* Show More Toggle Button */}
                     <button
                         onClick={() => setShowMore((prev) => !prev)}
                         className="btn btn-sm btn-outline text-white border-white hover:bg-white hover:text-primary transition"
@@ -188,33 +160,9 @@ const Home = () => {
                         {showMore ? 'Show Less' : 'Show More'}
                     </button>
 
-                    {/* Expanded Cards with Icons */}
-                    {showMore && (
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm sm:text-base pt-4 border-t border-white/20">
-                            {[
-                                { label: 'Min Temp', value: `${Math.round(weather.main.temp_min)}°C`, icon: <WiThermometer /> },
-                                { label: 'Max Temp', value: `${Math.round(weather.main.temp_max)}°C`, icon: <WiThermometer /> },
-                                { label: 'Pressure', value: `${weather.main.pressure} hPa`, icon: <WiBarometer /> },
-                                { label: 'Wind Direction', value: `${weather.wind.deg}°`, icon: <WiDirectionUp /> },
-                                { label: 'Cloudiness', value: `${weather.clouds.all}%`, icon: <WiCloudy /> },
-                                { label: 'Timezone', value: `UTC${weather.timezone >= 0 ? '+' : ''}${weather.timezone / 3600}`, icon: <WiTime3 /> },
-                                { label: 'Coord', value: `[${weather.coord.lat}, ${weather.coord.lon}]`, icon: <WiCloudy /> },
-                                { label: 'Condition ID', value: weather.weather[0].id, icon: <WiDaySunnyOvercast /> },
-                            ].map((item, i) => (
-                                <div
-                                    key={i}
-                                    className="bg-white bg-opacity-10 p-4 rounded-xl backdrop-blur-md border border-white/20 flex flex-col items-center space-y-1"
-                                >
-                                    <div className="text-3xl text-neutral">{item.icon}</div>
-                                    <p className="font-semibold text-sm text-primary">{item.label}</p>
-                                    <p className="text-sm text-neutral">{item.value}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    {showMore && <WeatherDetails weather={weather} />}
                 </motion.section>
             )}
-
         </main>
     );
 };
