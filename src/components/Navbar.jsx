@@ -22,7 +22,6 @@ const Navbar = () => {
 
   const links = [
     { to: '/', label: 'Home' },
-    { to: '/forecast', label: 'Forecast' },
     { to: '/weekly', label: 'Weekly' },
     { to: '/air-quality', label: 'Air Quality' },
     { to: '/map', label: 'Map View' },
