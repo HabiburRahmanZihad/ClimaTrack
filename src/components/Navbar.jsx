@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { Link, NavLink } from 'react-router';
 import { WiDaySunny } from 'react-icons/wi';
 import { HiMenuAlt3, HiX } from 'react-icons/hi';
@@ -8,13 +7,13 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinkClass = ({ isActive }) =>
-    `text-lg font-semibold px-3 py-1 rounded transition-all duration-200 ${isActive
+    `text-lg font-semibold px-4 py-2 rounded transition-all duration-200 ${isActive
       ? 'text-primary border-b-2 border-primary dark:text-primary'
       : 'text-base-content hover:text-primary hover:bg-base-200 dark:hover:text-primary'
     }`;
 
   return (
-    <header className="bg-base-100 shadow-md sticky top-0 z-50">
+    <header className="bg-base-100 shadow-md sticky top-0 z-50 transition-colors">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
         <Link
@@ -25,7 +24,7 @@ const Navbar = () => {
           ClimaTrack
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-6 items-center">
           <NavLink to="/" className={navLinkClass}>
             Home
@@ -37,25 +36,37 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-3xl text-primary"
+          className="md:hidden text-3xl text-primary focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
+          aria-expanded={menuOpen}
         >
           {menuOpen ? <HiX /> : <HiMenuAlt3 />}
         </button>
       </div>
 
-      {/* Mobile Dropdown */}
-      {menuOpen && (
-        <div className="md:hidden bg-base-100 px-6 pb-4 flex flex-col gap-3">
-          <NavLink to="/" className={navLinkClass} onClick={() => setMenuOpen(false)}>
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden bg-base-100 overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+      >
+        <nav className="px-6 pb-4 pt-2 flex flex-col gap-2">
+          <NavLink
+            to="/"
+            className={navLinkClass}
+            onClick={() => setMenuOpen(false)}
+          >
             Home
           </NavLink>
-          <NavLink to="/forecast" className={navLinkClass} onClick={() => setMenuOpen(false)}>
+          <NavLink
+            to="/forecast"
+            className={navLinkClass}
+            onClick={() => setMenuOpen(false)}
+          >
             Forecast
           </NavLink>
-        </div>
-      )}
+        </nav>
+      </div>
     </header>
   );
 };
