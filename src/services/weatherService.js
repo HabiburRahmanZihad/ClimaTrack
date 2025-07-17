@@ -1,12 +1,13 @@
 import axios from 'axios';
 
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
-const baseUrl = 'https://api.openweathermap.org/data/2.5';
+const baseUrlV2 = 'https://api.openweathermap.org/data/2.5';
+const geoUrl = 'https://api.openweathermap.org/geo/1.0/direct';
 
 // Fetch current weather data by city name
 export const fetchWeatherByCity = async (city) => {
     if (!city) throw new Error('City name is required');
-    const res = await axios.get(`${baseUrl}/weather`, {
+    const res = await axios.get(`${baseUrlV2}/weather`, {
         params: {
             q: city,
             appid: apiKey,
@@ -19,7 +20,7 @@ export const fetchWeatherByCity = async (city) => {
 // Fetch 5-day forecast by city name
 export const fetchForecastByCity = async (city) => {
     if (!city) throw new Error('City name is required');
-    const res = await axios.get(`${baseUrl}/forecast`, {
+    const res = await axios.get(`${baseUrlV2}/forecast`, {
         params: {
             q: city,
             appid: apiKey,
@@ -51,7 +52,7 @@ export const geocodeCity = async (city) => {
     } catch (error) {
         // Fallback: use current weather API to get coordinates
         console.warn('Geocoding failed, using weather API fallback:', error.message);
-        const weatherRes = await axios.get(`${baseUrl}/weather`, {
+        const weatherRes = await axios.get(`${baseUrlV2}/weather`, {
             params: {
                 q: city,
                 appid: apiKey,
@@ -76,7 +77,7 @@ export const fetchWeeklyForecast = async (lat, lon, city = null) => {
         throw new Error('Either city or lat/lon coordinates must be provided');
     }
 
-    const res = await axios.get(`${baseUrl}/forecast`, { params });
+    const res = await axios.get(`${baseUrlV2}/forecast`, { params });
 
     if (!res.data || !res.data.list) {
         throw new Error('Invalid forecast data received');
@@ -130,4 +131,34 @@ export const fetchWeeklyForecast = async (lat, lon, city = null) => {
     }
 
     return dailyForecast;
+};
+
+
+export const fetchUvSunData = async (city) => {
+    if (!city) throw new Error('City name is required');
+
+    try {
+        // Step 1: Get basic weather info (for sunrise/sunset)
+        const { data } = await axios.get(`${baseUrlV2}/weather`, {
+            params: { q: city, appid: apiKey, units: 'metric' },
+        });
+
+        const { sunrise, sunset } = data.sys;
+
+        // Optional: estimate UV index based on conditions
+        // Since OpenWeatherMap's free weather endpoint doesn't give UV,
+        // you could estimate by time of day, weather, etc.
+        // We'll return a dummy safe value
+        const fallbackUv = 5.5;
+
+        return {
+            uvi: fallbackUv,
+            sunrise,
+            sunset,
+        };
+
+    } catch (err) {
+        console.error('Failed to fetch UV/sun data:', err.message);
+        throw new Error('Failed to fetch UV/sunlight data');
+    }
 };
