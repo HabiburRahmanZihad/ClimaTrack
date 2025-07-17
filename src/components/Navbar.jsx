@@ -1,16 +1,23 @@
 import { Link, NavLink } from 'react-router';
 import { WiDaySunny } from 'react-icons/wi';
 import { HiMenuAlt3, HiX } from 'react-icons/hi';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) setMenuOpen(false); // lg breakpoint
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const navLinkClass = ({ isActive }) =>
-    `text-lg font-semibold px-4 py-2 rounded transition-all duration-200 ${
-      isActive
-        ? 'text-primary border-b-2 border-primary dark:text-primary'
-        : 'text-base-content hover:text-primary hover:bg-base-200 dark:hover:text-primary'
+    `block px-4 py-2 rounded-md text-base font-medium transition-colors duration-200 ${isActive
+      ? 'text-primary bg-base-200 dark:bg-base-300'
+      : 'text-base-content hover:text-primary hover:bg-base-200 dark:hover:bg-base-300'
     }`;
 
   const links = [
@@ -23,7 +30,7 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="bg-base-100 shadow-md sticky top-0 z-50 transition-colors">
+    <header className="bg-base-100 shadow-sm sticky top-0 z-50 transition duration-300">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
         <Link
@@ -35,7 +42,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-4 lg:gap-6 items-center">
+        <nav className="hidden lg:flex gap-4 items-center">
           {links.map(({ to, label }) => (
             <NavLink key={to} to={to} className={navLinkClass}>
               {label}
@@ -43,9 +50,9 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Mobile Menu Toggle */}
+        {/* Hamburger Menu Button (lg and smaller only) */}
         <button
-          className="md:hidden text-3xl text-primary focus:outline-none"
+          className="lg:hidden text-3xl text-primary focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
           aria-expanded={menuOpen}
@@ -54,11 +61,10 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Dropdown (visible on md and below) */}
       <div
-        className={`md:hidden bg-base-100 overflow-hidden transition-all duration-300 ease-in-out ${
-          menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`lg:hidden transition-all duration-300 ease-in-out overflow-hidden ${menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <nav className="px-6 pb-4 pt-2 flex flex-col gap-2">
           {links.map(({ to, label }) => (
