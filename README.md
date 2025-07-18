@@ -3,7 +3,6 @@
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react\&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6.3-646CFF?logo=vite\&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-4.1-06B6D4?logo=tailwindcss\&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-Backend-000000?logo=vercel\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 
