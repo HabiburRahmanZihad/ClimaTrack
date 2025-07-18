@@ -1,19 +1,15 @@
-
-
-import { useState, useEffect } from 'react';
-import { fetchWeatherByCity } from '../../services/weatherService';
+import { useState, useEffect, useCallback } from 'react';
+import { fetchWeatherByCity, fetchWeatherByCoords } from '../../services/weatherService';
 import Lottie from 'lottie-react';
 import weatherAnimation from '../../assets/animation/clouds loop.json';
 import { motion } from 'framer-motion';
 import WeatherSummary from './WeatherSummary';
 import WeatherDetails from './WeatherDetails';
 
-
-
 const Home = () => {
     const [city, setCity] = useState('');
     const [weather, setWeather] = useState(null);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [dateTime, setDateTime] = useState(new Date());
     const [showMore, setShowMore] = useState(false);
@@ -23,43 +19,67 @@ const Home = () => {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        const fetchDefaultCity = async () => {
-            setLoading(true);
+    const fetchWeather = useCallback(async (cityName) => {
+        setLoading(true);
+        setError(null);
+        setWeather(null);
+
+        try {
+            const data = await fetchWeatherByCity(cityName);
+            setWeather(data);
+        } catch (err) {
+            if (err.response?.status === 404) {
+                setError('City not found. Please check the spelling.');
+            } else {
+                setError('Failed to fetch weather data. Please try again later.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchWeatherByGeolocation = useCallback(() => {
+        setLoading(true);
+        setError(null);
+        setWeather(null);
+
+        const onSuccess = async (position) => {
             try {
-                const data = await fetchWeatherByCity('Chittagong');
+                const { latitude, longitude } = position.coords;
+                const data = await fetchWeatherByCoords(latitude, longitude);
                 setWeather(data);
-            } catch {
-                setError('Failed to load default city.');
-            } finally {
                 setLoading(false);
+            } catch (error) {
+                await fetchWeather('Chittagong');
+                console.log(`Error fetching weather by geolocation: ${error.message}`);
             }
         };
-        fetchDefaultCity();
-    }, []);
+
+        const onError = async () => {
+            await fetchWeather('Chittagong');
+        };
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(onSuccess, onError);
+        } else {
+            onError();
+        }
+    }, [fetchWeather]);
+
+    useEffect(() => {
+        fetchWeatherByGeolocation();
+    }, [fetchWeatherByGeolocation]);
 
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!city.trim()) return;
-
-        setLoading(true);
-        setError('');
-        setWeather(null);
-
-        try {
-            const data = await fetchWeatherByCity(city.trim());
-            setWeather(data);
-            setCity('');
-        } catch {
-            setError('City not found. Please try again.');
-        } finally {
-            setLoading(false);
-        }
+        await fetchWeather(city.trim());
+        setCity('');
     };
 
     const handleInputChange = (e) => {
         setCity(e.target.value);
-        if (error) setError('');
+        if (error) setError(null);
     };
 
     return (
@@ -91,6 +111,7 @@ const Home = () => {
                     className="input input-bordered w-full sm:max-w-sm text-lg px-4 py-3 dark:input-primary focus:outline-none focus:ring-2 focus:ring-primary"
                     aria-label="Enter city"
                     autoFocus
+                    disabled={loading}
                 />
 
                 <button

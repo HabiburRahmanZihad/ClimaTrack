@@ -162,3 +162,20 @@ export const fetchUvSunData = async (city) => {
         throw new Error('Failed to fetch UV/sunlight data');
     }
 };
+
+
+// Fetch current weather data by coordinates
+export const fetchWeatherByCoords = async (lat, lon) => {
+    if (!lat || !lon) throw new Error('Latitude and longitude are required');
+
+    const res = await axios.get(`${baseUrlV2}/weather`, {
+        params: {
+            lat,
+            lon,
+            appid: apiKey,
+            units: 'metric',
+        },
+    });
+
+    return res.data;
+};
