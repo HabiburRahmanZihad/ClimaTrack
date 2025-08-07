@@ -48,15 +48,16 @@ const Home = () => {
                 const { latitude, longitude } = position.coords;
                 const data = await fetchWeatherByCoords(latitude, longitude);
                 setWeather(data);
-                setLoading(false);
             } catch (error) {
                 await fetchWeather('Chittagong');
-                console.log(`Error fetching weather by geolocation: ${error.message}`);
+            } finally {
+                setLoading(false);
             }
         };
 
         const onError = async () => {
             await fetchWeather('Chittagong');
+            setLoading(false);
         };
 
         if (navigator.geolocation) {
@@ -83,40 +84,42 @@ const Home = () => {
     };
 
     return (
-        <main className="w-full px-4 sm:px-6 md:px-8 mt-10 text-center space-y-8">
+        <main className="w-full px-4 sm:px-6 md:px-8 mt-12 text-center space-y-10">
+            {/* Header */}
             <header className="space-y-2">
-                <h2 className="text-4xl sm:text-5xl font-bold font-serif text-primary">
+                <h2 className="text-4xl sm:text-5xl font-extrabold text-primary font-serif tracking-tight">
                     Weather Dashboard
                 </h2>
-                <p className="text-neutral">
+                <p className="text-neutral text-sm sm:text-base">
                     {dateTime.toLocaleDateString()} — {dateTime.toLocaleTimeString()}
                 </p>
             </header>
 
+            {/* Animation */}
             <Lottie
                 animationData={weatherAnimation}
                 loop
                 className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto"
             />
 
+            {/* Search Form */}
             <form
                 onSubmit={handleSearch}
-                className="flex flex-col sm:flex-row gap-4 justify-center"
+                className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
                 <input
                     type="text"
                     value={city}
                     onChange={handleInputChange}
                     placeholder="Enter city name"
-                    className="input input-bordered w-full sm:max-w-sm text-lg px-4 py-3 dark:input-primary focus:outline-none focus:ring-2 focus:ring-primary"
-                    aria-label="Enter city"
+                    className="input input-bordered w-full sm:max-w-xs text-lg px-4 py-3 dark:input-primary focus:outline-none focus:ring-2 focus:ring-primary"
+                    aria-label="City input"
                     autoFocus
                     disabled={loading}
                 />
-
                 <button
                     type="submit"
-                    className="btn btn-primary w-full sm:w-auto text-lg px-6 py-3"
+                    className="btn btn-primary text-lg px-6 py-3 sm:w-auto w-full"
                     disabled={loading}
                 >
                     {loading ? (
@@ -127,6 +130,7 @@ const Home = () => {
                 </button>
             </form>
 
+            {/* Status Messages */}
             <div className="min-h-[1.5rem]" aria-live="polite">
                 {loading && (
                     <div className="flex justify-center py-4">
@@ -143,27 +147,30 @@ const Home = () => {
                 )}
             </div>
 
+            {/* Weather Card */}
             {weather && (
                 <motion.section
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 15 }}
-                    className="bg-gradient-to-br from-blue-600 to-blue-400 dark:from-primary dark:to-accent text-white p-6 rounded-2xl shadow-2xl space-y-6 max-w-4xl mx-auto"
+                    transition={{ type: 'spring', stiffness: 100, damping: 18 }}
+                    className="bg-gradient-to-br from-blue-600 to-blue-400 dark:from-primary dark:to-accent text-white p-6 rounded-2xl shadow-xl space-y-6 max-w-4xl mx-auto"
                 >
-                    <div className="flex flex-col sm:flex-row justify-between items-center">
+                    {/* Summary Header */}
+                    <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left gap-4">
                         <div>
                             <h3 className="text-2xl font-bold font-serif">
                                 {weather.name}, {weather.sys.country}
                             </h3>
-                            <p className="capitalize opacity-90">
+                            <p className="capitalize opacity-90 text-sm sm:text-base">
                                 {weather.weather[0].description}
                             </p>
                         </div>
-                        <div className="text-6xl font-extrabold" aria-live="polite">
+                        <div className="text-6xl font-extrabold">
                             {Math.round(weather.main.temp)}°C
                         </div>
                     </div>
 
+                    {/* Weather Icon */}
                     <div>
                         <img
                             src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
@@ -172,8 +179,10 @@ const Home = () => {
                         />
                     </div>
 
+                    {/* Summary Data */}
                     <WeatherSummary weather={weather} />
 
+                    {/* Toggle Button */}
                     <button
                         onClick={() => setShowMore((prev) => !prev)}
                         className="btn btn-sm btn-outline text-white border-white hover:bg-white hover:text-primary transition"
@@ -181,6 +190,7 @@ const Home = () => {
                         {showMore ? 'Show Less' : 'Show More'}
                     </button>
 
+                    {/* Details Section */}
                     {showMore && <WeatherDetails weather={weather} />}
                 </motion.section>
             )}
